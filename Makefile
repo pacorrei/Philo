@@ -1,27 +1,40 @@
 NAME = philo
 
-SRCS = srcs/*.c
+all: ${NAME}
 
-FLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra
+CC = gcc
+
+RM = rm -rf
+
+HEAD = -I srcs/
 
 
+SRCS_PATH = srcs/
 
-all: $(NAME)
+OBJS_PATH = objs/
 
-$(NAME):
-	@echo "Création de l'executable..."
-	@gcc $(FLAGS) $(SRCS) -o $(NAME) -lpthread
-	@echo "Compilation terminée !"
+SRCS_NAME = main.c utils.c thread_action.c thread_utils.c struct_and_mutex.c \
 
+OBJS_NAME = $(SRCS_NAME:.c=.o)
+
+SRCS = $(addprefix $(SRCS_PATH), $(SRCS_NAME))
+
+OBJS = $(addprefix $(OBJS_PATH), $(OBJS_NAME))
+
+$(OBJS_PATH)%.o: $(SRCS_PATH)%.c
+	mkdir $(OBJS_PATH) 2> /dev/null || true
+	gcc -c $(FLAGS) $(HEAD) -o $@ -c $<
+
+$(NAME):  ${OBJS}
+		${CC} ${CFLAGS} ${SRCS} ${HEAD} -o ${NAME} -lpthread
 
 clean:
-	@echo "Clean..."
-	@rm -rf $(NAME)
-	@echo "Clean !"
+	$(RM) $(OBJS)
 
-fclean:
-	@echo "Full clean..."
-	@rm  -rf $(NAME)
-	@echo "Fclean !"
+fclean: clean
+	$(RM) $(NAME)
 
-re:	clean all
+re :	fclean all
+
+.PHONY: all clean fclean re
